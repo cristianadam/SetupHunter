@@ -1,11 +1,11 @@
 # SetupHunter
 Easy setup of [Hunter Package Manager](https://github.com/cpp-pm/hunter) via [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html).
 
-The project will download the latest [HunterGate.cmake](https://github.com/cpp-pm/gate), and the latest [packages archive release](https://github.com/cpp-pm/hunter/releases/) so that the project is easy to setup and always up to date!
+The project will download the latest [HunterGate.cmake](https://github.com/cpp-pm/gate), and the latest [packages archive release](https://github.com/cpp-pm/hunter/releases/) so that the project is easy to setup, and always up to date!
 
 # Usage
 
-Setting up the latest HunterGate, and adding a package is as easy as:
+Setting up Hunter, and adding a package is as easy as:
 
 ```cmake
 # Setting up dlib as an external package
