@@ -15,7 +15,7 @@ include(FetchContent)
 FetchContent_Declare(SetupHunter GIT_REPOSITORY https://github.com/cristianadam/SetupHunter.git)
 FetchContent_MakeAvailable(SetupHunter)
 
-# Using 
+# Using the dlib package
 find_package(dlib REQUIRED)
 target_link_libraries(myapp PRIVATE dlib::dlib)
 ```
@@ -36,3 +36,7 @@ set(HUNTER_PACKAGES pcre2)
 set(HUNTER_Boost_COMPONENTS Filesystem Python)
 set(HUNTER_PACKAGES Boost)
 ```
+
+# Minimum CMake version
+
+[FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html) is avaiable since CMake 3.11.
