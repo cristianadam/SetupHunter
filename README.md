@@ -12,8 +12,8 @@ Setting up the latest HunterGate, and adding a package is as easy as:
 set(HUNTER_PACKAGES dlib)
 
 include(FetchContent)
-FetchContent_Declare(HunterSetup GIT_REPOSITORY https://github.com/cristianadam/SetupHunter.git)
-FetchContent_MakeAvailable(HunterSetup)
+FetchContent_Declare(SetupHunter GIT_REPOSITORY https://github.com/cristianadam/SetupHunter.git)
+FetchContent_MakeAvailable(SetupHunter)
 
 # Using 
 find_package(dlib REQUIRED)
