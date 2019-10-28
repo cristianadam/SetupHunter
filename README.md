@@ -30,7 +30,7 @@ set(HUNTER_PACKAGES pcre2)
 ```
 
 # Usage with package components
-```
+```cmake
 set(HUNTER_Boost_COMPONENTS Filesystem Python)
 set(HUNTER_PACKAGES Boost)
 ```
