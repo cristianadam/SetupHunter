@@ -86,7 +86,9 @@ configure_file(
   ${CMAKE_BINARY_DIR}/HunterSetup.cmake @ONLY)
 
 # Build only the current CMAKE_BUILD_TYPE
-set(HUNTER_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE} CACHE STRING "" FORCE)
+if (NOT HUNTER_CONFIGURATION_TYPES)
+  set(HUNTER_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE})
+endif()
 
 include(${CMAKE_BINARY_DIR}/HunterSetup.cmake)
 
