@@ -15,6 +15,9 @@ SetupHunter will set the `CMAKE_BUILD_TYPE` as `HUNTER_CONFIGURATION_TYPES`, so 
 Setting up Hunter, and adding a package is as easy as:
 
 ```cmake
+# FetchContent is available since CMake version 3.11
+cmake_minimum_required(VERSION 3.11)
+
 # Setting up dlib as an external package
 set(HUNTER_PACKAGES dlib)
 
@@ -72,7 +75,3 @@ find_package(ZLIB CONFIG REQUIRED)
 add_executable(boo main.c)
 target_link_libraries(boo PRIVATE ZLIB::zlib)
 ```
-
-# Minimum CMake version
-
-[FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html) is avaiable since CMake 3.11.
