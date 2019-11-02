@@ -20,7 +20,7 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.2)
 
 #
 # Download the latest Hunter gate and release
@@ -72,7 +72,6 @@ configure_file(
   ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in
   ${CMAKE_BINARY_DIR}/HunterConfig.cmake @ONLY)
 
-
 file(WRITE
   ${CMAKE_BINARY_DIR}/HunterSetup.cmake.in
   "include(${CMAKE_BINARY_DIR}/HunterGate.cmake)\n"
@@ -116,7 +115,7 @@ if(ANDROID_ABI AND ANDROID_NATIVE_API_LEVEL)
     "set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)\n")
 endif()
 
-foreach(lang C CXX)
+foreach(lang IN ITEMS C CXX)
   if(CMAKE_${lang}_COMPILER_LAUNCHER)
     file(APPEND ${CMAKE_BINARY_DIR}/HunterToolchain.cmake.in
       "set(CMAKE_${lang}_COMPILER_LAUNCHER ${CMAKE_${lang}_COMPILER_LAUNCHER})\n")
@@ -139,7 +138,7 @@ project(HunterSetup)
 # Building the packages
 #
 
-# Build the hunter packages with the ANDROID_ABI / ANDROID_NATIVE_API_LEVEL settings
+# Build the hunter packages with the configured toolchain
 if (CMAKE_TOOLCHAIN_FILE)
   set(ORIGINAL_TOOLCHAIN_FILE ${CMAKE_TOOLCHAIN_FILE})
   set(CMAKE_TOOLCHAIN_FILE ${CMAKE_BINARY_DIR}/HunterToolchain.cmake)
