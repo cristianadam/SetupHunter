@@ -29,14 +29,23 @@ cmake_minimum_required(VERSION 3.5)
 file(
   DOWNLOAD https://raw.githubusercontent.com/cpp-pm/gate/master/cmake/HunterGate.cmake
   ${CMAKE_BINARY_DIR}/HunterGate.cmake)
-file(
-  DOWNLOAD https://api.github.com/repos/cpp-pm/hunter/releases/latest
-  ${CMAKE_BINARY_DIR}/LatestGate.json)
 
-file(READ ${CMAKE_BINARY_DIR}/LatestGate.json latestGateJson)
+if (NOT HUNTER_URL AND NOT HUNTER_SHA1)
+  file(
+    DOWNLOAD https://api.github.com/repos/cpp-pm/hunter/releases/latest
+    ${CMAKE_BINARY_DIR}/LatestGate.json)
 
-string(REGEX MATCH "URL \\\\\"(.*)\\\\\".*SHA1 \\\\\"(.*)\\\\\".*"
-  latestGateCMake "${latestGateJson}")
+  file(READ ${CMAKE_BINARY_DIR}/LatestGate.json latestGateJson)
+  string(REGEX MATCH "tag_name\": \"([a-z0-9.]+)\"" tagName "${latestGateJson}")
+
+  set(hunterUrlTarball "https://github.com/cpp-pm/hunter/archive/${CMAKE_MATCH_1}.tar.gz")
+  set(hunterLocalTarballName "${CMAKE_BINARY_DIR}/hunter-${CMAKE_MATCH_1}.tar.gz")
+
+  file(DOWNLOAD ${hunterUrlTarball} "${hunterLocalTarballName}")
+
+  file(SHA1 "${hunterLocalTarballName}" HUNTER_SHA1)
+  set(HUNTER_URL "file://${hunterLocalTarballName}")
+endif()
 
 # Write the Hunter Configuration file
 file(WRITE ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in "")
@@ -63,13 +72,6 @@ configure_file(
   ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in
   ${CMAKE_BINARY_DIR}/HunterConfig.cmake @ONLY)
 
-if (NOT HUNTER_URL)
-  set(HUNTER_URL ${CMAKE_MATCH_1})
-endif()
-
-if (NOT HUNTER_SHA1)
-  set(HUNTER_SHA1 ${CMAKE_MATCH_2})
-endif()
 
 file(WRITE
   ${CMAKE_BINARY_DIR}/HunterSetup.cmake.in
@@ -77,7 +79,7 @@ file(WRITE
   "HunterGate(
     URL ${HUNTER_URL}
     SHA1 ${HUNTER_SHA1}
-    FILEPATH ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in
+    FILEPATH ${CMAKE_BINARY_DIR}/HunterConfig.cmake
    )\n"
 )
 
@@ -87,7 +89,7 @@ configure_file(
 
 # Build only the current CMAKE_BUILD_TYPE
 if (NOT HUNTER_CONFIGURATION_TYPES)
-  set(HUNTER_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE})
+  set(HUNTER_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE} CACHE STRING "Configurations HUNTER will build")
 endif()
 
 include(${CMAKE_BINARY_DIR}/HunterSetup.cmake)
@@ -113,6 +115,13 @@ if(ANDROID_ABI AND ANDROID_NATIVE_API_LEVEL)
     # Android has RPATH, and we dont' have to relink when installed\n"
     "set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)\n")
 endif()
+
+foreach(lang C CXX)
+  if(CMAKE_${lang}_COMPILER_LAUNCHER)
+    file(APPEND ${CMAKE_BINARY_DIR}/HunterToolchain.cmake.in
+      "set(CMAKE_${lang}_COMPILER_LAUNCHER ${CMAKE_${lang}_COMPILER_LAUNCHER})\n")
+  endif()
+endforeach()
 
 if (CMAKE_TOOLCHAIN_FILE)
   file(APPEND ${CMAKE_BINARY_DIR}/HunterToolchain.cmake.in
