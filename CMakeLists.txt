@@ -47,30 +47,46 @@ if (NOT HUNTER_URL AND NOT HUNTER_SHA1)
   set(HUNTER_URL "file://${hunterLocalTarballName}")
 endif()
 
-# Write the Hunter Configuration file
-file(WRITE ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in "")
-foreach(package IN LISTS HUNTER_PACKAGES)
-  file(APPEND ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in
-    "hunter_config(${package}
-       VERSION ")
-  if (HUNTER_${package}_VERSION)
+if (NOT HUNTER_LOCAL_CONFIG OR
+    NOT HUNTER_GLOBAL_CONFIG OR
+    NOT HUNTER_FILEPATH_CONFIG OR
+    HUNTER_PACKAGES)
+  # Write the Hunter Configuration file
+  file(WRITE ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in "")
+  foreach(package IN LISTS HUNTER_PACKAGES)
     file(APPEND ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in
-      "${HUNTER_${package}_VERSION}")
-  else()
-    file(APPEND ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in
-      "\${HUNTER_${package}_VERSION}")
-  endif()
+      "hunter_config(${package}
+        VERSION ")
+    if (HUNTER_${package}_VERSION)
+      file(APPEND ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in
+        "${HUNTER_${package}_VERSION}")
+    else()
+      file(APPEND ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in
+        "\${HUNTER_${package}_VERSION}")
+    endif()
 
-  if (HUNTER_${package}_CMAKE_ARGS)
-    file(APPEND ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in "
-      CMAKE_ARGS \${HUNTER_${package}_CMAKE_ARGS}")
-  endif()
+    if (HUNTER_${package}_CMAKE_ARGS)
+      file(APPEND ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in "
+        CMAKE_ARGS \${HUNTER_${package}_CMAKE_ARGS}")
+    endif()
 
-  file(APPEND ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in ")\n\n")
-endforeach()
-configure_file(
-  ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in
-  ${CMAKE_BINARY_DIR}/HunterConfig.cmake @ONLY)
+    file(APPEND ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in ")\n\n")
+  endforeach()
+  configure_file(
+    ${CMAKE_BINARY_DIR}/HunterConfig.cmake.in
+    ${CMAKE_BINARY_DIR}/HunterConfig.cmake @ONLY)
+endif()
+
+unset(HUNTER_GATE_CONFIG)
+if (HUNTER_LOCAL_CONFIG)
+  set(HUNTER_GATE_CONFIG LOCAL)
+elseif (HUNTER_GLOBAL_CONFIG)
+  set(HUNTER_GATE_CONFIG GLOBAL ${HUNTER_GLOBAL_CONFIG})
+elseif (HUNTER_FILEPATH_CONFIG)
+  set(HUNTER_GATE_CONFIG FILEPATH ${HUNTER_FILEPATH_CONFIG})
+elseif (HUNTER_PACKAGES)
+  set(HUNTER_GATE_CONFIG FILEPATH ${CMAKE_BINARY_DIR}/HunterConfig.cmake)
+endif()
 
 file(WRITE
   ${CMAKE_BINARY_DIR}/HunterSetup.cmake.in
@@ -78,7 +94,7 @@ file(WRITE
   "HunterGate(
     URL ${HUNTER_URL}
     SHA1 ${HUNTER_SHA1}
-    FILEPATH ${CMAKE_BINARY_DIR}/HunterConfig.cmake
+    ${HUNTER_GATE_CONFIG}
    )\n"
 )
 
