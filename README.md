@@ -10,9 +10,12 @@ variables for appropriate values.
 
 SetupHunter will set the `CMAKE_BUILD_TYPE` as `HUNTER_CONFIGURATION_TYPES`, so that if you're building `Release` you won't be getting a `Debug` build of the packages.
 
-# Usage
+SetupHunter will create a `HunterToolchain.cmake` file which will set up the `CMAKE_PREFIX_PATH` and `CMAKE_FIND_ROOT_PATH` variables with the installed path of the Hunter packages.
+If a `CMAKE_TOOLCHAIN_FILE` was used during compilation, it will be included in the `HunterToolchain.cmake` file.
 
-Setting up Hunter, and adding a package is as easy as:
+## Usage
+
+Setting up Hunter, and adding a package list is as easy as:
 
 ```cmake
 # FetchContent is available since CMake version 3.11
@@ -30,7 +33,7 @@ find_package(dlib REQUIRED)
 target_link_libraries(myapp PRIVATE dlib::dlib)
 ```
 
-# Usage with custom CMake variables per package
+## Usage with custom CMake variables per package
 ```cmake
 set(HUNTER_pcre2_CMAKE_ARGS
   PCRE2_BUILD_PCRE2_8=OFF
@@ -41,29 +44,58 @@ set(HUNTER_pcre2_CMAKE_ARGS
 set(HUNTER_PACKAGES pcre2)
 ```
 
-# Usage with package components
+## Usage with package components
 ```cmake
 set(HUNTER_Boost_COMPONENTS Filesystem Python)
 set(HUNTER_PACKAGES Boost)
 ```
 
-# Usage with specific package version
+## Usage with specific package version
 ```cmake
 set(HUNTER_fmt_VERSION 5.3.0)
 set(HUNTER_PACKAGES fmt)
 ```
 
-# Usage with specific Hunter Gate
+## Usage with specific Hunter Gate
 ```cmake
-set(HUNTER_URL "https://github.com/cpp-pm/hunter/archive/v0.23.222.tar.gz")
-set(HUNTER_SHA1 "0b88baaa2a9a35b8ce632c57ade66be8dd918afd")
+set(HUNTER_URL "https://github.com/cpp-pm/hunter/archive/v0.23.224.tar.gz")
+set(HUNTER_SHA1 "18e57a43efc435f2e1dae1291e82e42afbf940be")
+set(HUNTER_FILEPATH_CONFIG "path/to/HunterConfig.cmake")
 
 include(FetchContent)
 FetchContent_Declare(SetupHunter GIT_REPOSITORY https://github.com/cristianadam/SetupHunter)
 FetchContent_MakeAvailable(SetupHunter)
 ```
 
-# Usage with classic Hunter setup
+## Usage with HunterToolchain.cmake
+
+This allows building the 3rd party packages separate than the user projects, and simply use CMake's
+`find_package` with no usage of Hunter at all.
+
+```cmake
+cmake_minimum_required(VERSION 3.11)
+
+set(HUNTER_PACKAGES freetype ZLIB PNG double-conversion pcre2)
+
+set(HUNTER_pcre2_CMAKE_ARGS
+    PCRE2_BUILD_PCRE2_8=OFF
+    PCRE2_BUILD_PCRE2_16=ON
+    PCRE2_BUILD_PCRE2_32=OFF
+    PCRE2_SUPPORT_JIT=ON)
+
+include(FetchContent)
+FetchContent_Declare(SetupHunter GIT_REPOSITORY https://github.com/cristianadam/SetupHunter)
+FetchContent_MakeAvailable(SetupHunter)
+
+project(3rdparty)
+```
+
+Then compile your project with:
+```
+cmake -DCMAKE_TOOLCHAIN_FILE=/path/to/your/3rdparty/build/HunterToolchain.cmake
+```
+
+## Usage with classic Hunter setup
 ```cmake
 include(FetchContent)
 FetchContent_Declare(SetupHunter GIT_REPOSITORY https://github.com/cristianadam/SetupHunter)
