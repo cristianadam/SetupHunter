@@ -102,7 +102,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE=/path/to/your/3rdparty/build/HunterToolchain.cmake
 file(WRITE ${CMAKE_BUILD_DIR}/HunterConfig.cmake [=[
 hunter_config(zlib VERSION 1.2.8)
 
-hunter_config(pcre2_
+hunter_config(pcre2
   VERSION ${HUNTER_pcre2_VERSION}
   CMAKE_ARGS
     PCRE2_BUILD_PCRE2_8=OFF
@@ -124,7 +124,8 @@ hunter_add_package(ZLIB)
 hunter_add_package(pcre2)
 
 find_package(ZLIB CONFIG REQUIRED)
+find_package(pcre2 CONFIG REQUIRED)
 
 add_executable(boo main.c)
-target_link_libraries(boo PRIVATE ZLIB::zlib)
+target_link_libraries(boo PRIVATE ZLIB::zlib PCRE2::PCRE2)
 ```
