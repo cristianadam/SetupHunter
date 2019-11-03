@@ -60,7 +60,8 @@ set(HUNTER_PACKAGES fmt)
 ```cmake
 set(HUNTER_URL "https://github.com/cpp-pm/hunter/archive/v0.23.224.tar.gz")
 set(HUNTER_SHA1 "18e57a43efc435f2e1dae1291e82e42afbf940be")
-set(HUNTER_FILEPATH_CONFIG "path/to/HunterConfig.cmake")
+
+set(HUNTER_PACKAGES fmt ZLIB)
 
 include(FetchContent)
 FetchContent_Declare(SetupHunter GIT_REPOSITORY https://github.com/cristianadam/SetupHunter)
@@ -97,11 +98,31 @@ cmake -DCMAKE_TOOLCHAIN_FILE=/path/to/your/3rdparty/build/HunterToolchain.cmake
 
 ## Usage with classic Hunter setup
 ```cmake
+
+file(WRITE ${CMAKE_BUILD_DIR}/HunterConfig.cmake [=[
+hunter_config(zlib VERSION 1.2.8)
+
+hunter_config(pcre2_
+  VERSION ${HUNTER_pcre2_VERSION}
+  CMAKE_ARGS
+    PCRE2_BUILD_PCRE2_8=OFF
+    PCRE2_BUILD_PCRE2_16=ON
+    PCRE2_BUILD_PCRE2_32=OFF
+    PCRE2_SUPPORT_JIT=ON
+)
+]=])
+
+set(HUNTER_URL "https://github.com/cpp-pm/hunter/archive/v0.23.224.tar.gz")
+set(HUNTER_SHA1 "18e57a43efc435f2e1dae1291e82e42afbf940be")
+set(HUNTER_FILEPATH_CONFIG ${CMAKE_BUILD_DIR}/HunterConfig.cmake)
+
 include(FetchContent)
 FetchContent_Declare(SetupHunter GIT_REPOSITORY https://github.com/cristianadam/SetupHunter)
 FetchContent_MakeAvailable(SetupHunter)
 
 hunter_add_package(ZLIB)
+hunter_add_package(pcre2)
+
 find_package(ZLIB CONFIG REQUIRED)
 
 add_executable(boo main.c)
