@@ -1,3 +1,6 @@
+## Hunter Gate
+This project has been upstreamed to https://github.com/cpp-pm/gate!
+
 # SetupHunter
 Easy setup of [Hunter Package Manager](https://github.com/cpp-pm/hunter) via [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html).
 
